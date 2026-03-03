@@ -1,23 +1,19 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm-bullseye
 
 ARG NEXMAIL_VERSION=1.0.1
 ENV APP_ENV=production
 
-# Системные зависимости для PECL
-RUN apk add --no-cache \
-    bash \
-    curl \
+# Системные зависимости для PECL и PHP
+RUN apt-get update && apt-get install -y \
     unzip \
-    icu-dev \
-    oniguruma-dev \
+    curl \
+    git \
+    libicu-dev \
     libzip-dev \
     mariadb-client \
-    autoconf \
-    gcc \
-    g++ \
-    make \
-    linux-headers \
-    php8-dev
+    libonig-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
 # PHP расширения
 RUN docker-php-ext-install \
@@ -28,11 +24,11 @@ RUN docker-php-ext-install \
     zip \
     opcache
 
-# PECL Redis
+# PECL Redis (работает на Debian)
 RUN pecl install redis-7.6.0 \
     && docker-php-ext-enable redis
 
-# Release ZIP NexMail
+# Скачиваем release ZIP NexMail вместо git clone
 WORKDIR /var/www/html
 RUN curl -L https://codeberg.org/nexmail/NexMail/releases/download/${NEXMAIL_VERSION}/${NEXMAIL_VERSION}.zip \
     -o nexmail.zip \
