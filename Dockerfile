@@ -1,3 +1,5 @@
+RUN pecl install redis && docker-php-ext-enable redis
+
 # --------------------------
 # Runtime image
 # --------------------------
@@ -16,7 +18,15 @@ RUN apk add --no-cache \
     oniguruma-dev \
     libzip-dev \
     mariadb-client \
-    redis
+    redis \
+    libzip-dev \
+    mariadb-client \
+    redis \
+    autoconf \
+    gcc \
+    g++ \
+    make \
+    linux-headers
 
 # PHP extensions
 RUN docker-php-ext-install \
@@ -47,4 +57,5 @@ RUN chmod +x /entrypoint.sh
 USER www-data
 
 ENTRYPOINT ["/entrypoint.sh"]
+
 CMD ["php-fpm"]
