@@ -1,8 +1,3 @@
-RUN pecl install redis && docker-php-ext-enable redis
-
-# --------------------------
-# Runtime image
-# --------------------------
 FROM php:8.2-fpm-alpine
 
 ARG NEXMAIL_VERSION=1.0.1
@@ -18,10 +13,6 @@ RUN apk add --no-cache \
     oniguruma-dev \
     libzip-dev \
     mariadb-client \
-    redis \
-    libzip-dev \
-    mariadb-client \
-    redis \
     autoconf \
     gcc \
     g++ \
@@ -41,21 +32,16 @@ RUN pecl install redis && docker-php-ext-enable redis
 
 WORKDIR /var/www/html
 
-# Download release
+# Download release ZIP вместо git clone
 RUN curl -L \
     https://codeberg.org/nexmail/NexMail/releases/download/${NEXMAIL_VERSION}/${NEXMAIL_VERSION}.zip \
     -o nexmail.zip \
     && unzip nexmail.zip \
     && rm nexmail.zip
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/html
-
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 USER www-data
-
 ENTRYPOINT ["/entrypoint.sh"]
-
 CMD ["php-fpm"]
